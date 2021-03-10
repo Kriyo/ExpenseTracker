@@ -7,7 +7,9 @@ import useStyles from './styles'
 export const List = () => {
   const classes = useStyles()
   const transactions = [
-    {id: 1, amount: '10', date: new Date(), category: 'Salary', type: 'Income'}
+    {id: 3, amount: '10', date: 'Wed Mar 10 2021', category: 'Salary', type: 'Income'},
+    {id: 2, amount: '20', date: 'Wed Mar 5 2021', category: 'Business', type: 'Income'},
+    {id: 1, amount: '5', date: 'Wed Mar 1 2021', category: 'Pets', type: 'Expense'},
   ];
   return (
   <MUIList dense={false} className={classes.list}>
