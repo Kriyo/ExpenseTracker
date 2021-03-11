@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable no-return-assign */
 const incomeColors = [
   '#123123',
   '#154731',
