@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 
 import {
   TextField,
@@ -37,6 +37,10 @@ export const Form = () => {
     formData.type === 'Income' ? incomeCategories : expenseCategories
 
   const createTransaction = () => {
+    // Bail if there's no amount or date supplied
+    if (Number.isNaN(Number(formData.amount)) || !formData.date.includes('-'))
+      return
+
     const transaction = {
       ...formData,
       amount: Number(formData.amount),
@@ -46,6 +50,67 @@ export const Form = () => {
     addTransaction(transaction)
     setFormData(initialState)
   }
+
+  // Handles voice commands for creating transactions.
+  // eslint-disable-next-line consistent-return
+  useEffect(() => {
+    if (segment) {
+      if (segment.intent.intent === 'add_expense') {
+        setFormData({ ...formData, type: 'Expense' })
+      } else if (segment.intent.intent === 'add_income') {
+        setFormData({ ...formData, type: 'Income' })
+      } else if (
+        segment.isFinal &&
+        segment.intent.intent === 'create_transaction'
+      ) {
+        return createTransaction()
+      } else if (
+        segment.isFinal &&
+        segment.intent.intent === 'cancel_transaction'
+      ) {
+        return setFormData(initialState)
+      }
+
+      segment.entities.forEach((entity) => {
+        // String format the entity to Capitalise case
+        const category = `${entity.value.charAt(0)}${entity.value
+          .slice(1)
+          .toLowerCase()}`
+
+        switch (entity.type) {
+          case 'amount':
+            setFormData({ ...formData, amount: entity.value })
+            break
+          case 'category':
+            // If the user confused a category with the income / expense types this autofixes the command.
+            if (incomeCategories.map((ic) => ic.type).includes(category)) {
+              setFormData({ ...formData, type: 'Income', category })
+            } else if (
+              expenseCategories.map((ic) => ic.type).includes(category)
+            ) {
+              setFormData({ ...formData, type: 'Expense', category })
+            }
+            break
+          case 'date':
+            setFormData({ ...formData, date: entity.value })
+            break
+          default:
+            break
+        }
+      })
+
+      // If all fields are filled out via voice automatically create the transaction.
+      if (
+        segment.isFinal &&
+        formData.amount &&
+        formData.category &&
+        formData.type &&
+        formData.date
+      ) {
+        createTransaction()
+      }
+    }
+  }, [segment])
 
   return (
     <Grid container spacing={2}>
