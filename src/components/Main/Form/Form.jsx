@@ -12,6 +12,11 @@ import {
 } from '@material-ui/core'
 import { v4 as uuidv4 } from 'uuid'
 import { ExpenseTrackerContext } from '../../../context/context'
+import {
+  incomeCategories,
+  expenseCategories,
+} from '../../../constants/categories'
+
 import useStyles from './styles'
 
 const initialState = {
@@ -25,6 +30,8 @@ export const Form = () => {
   const classes = useStyles()
   const [formData, setFormData] = useState(initialState)
   const { addTransaction } = useContext(ExpenseTrackerContext)
+  const selectedCategories =
+    formData.type === 'Income' ? incomeCategories : expenseCategories
 
   const createTransaction = () => {
     const transaction = {
@@ -65,8 +72,11 @@ export const Form = () => {
               setFormData({ ...formData, category: e.target.value })
             }
           >
-            <MenuItem value="Business">Business</MenuItem>
-            <MenuItem value="Salary">Salary</MenuItem>
+            {selectedCategories.map((category) => (
+              <MenuItem key={category.type} value={category.type}>
+                {category.type}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Grid>
