@@ -1,4 +1,4 @@
-# Getting Started with Create React App
+# Expense Tracker
 
 An expense tracker using React JS, Hooks & Speechly
 
