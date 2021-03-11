@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   TextField,
@@ -11,7 +12,7 @@ import {
   MenuItem,
 } from '@material-ui/core'
 import { useSpeechContext } from '@speechly/react-client'
-import { v4 as uuidv4 } from 'uuid'
+import { CustomisedSnackbar } from '../../Snackbar/Snackbar'
 import { formatDate } from '../../../utils/formatDate'
 import { ExpenseTrackerContext } from '../../../context/context'
 import {
@@ -30,6 +31,7 @@ const initialState = {
 
 export const Form = () => {
   const classes = useStyles()
+  const [open, setOpen] = useState(false)
   const [formData, setFormData] = useState(initialState)
   const { segment } = useSpeechContext()
   const { addTransaction } = useContext(ExpenseTrackerContext)
@@ -47,7 +49,13 @@ export const Form = () => {
       id: uuidv4(),
     }
 
+    // opens the alert
+    setOpen(true)
+
+    // creates the transaction
     addTransaction(transaction)
+
+    // resets state
     setFormData(initialState)
   }
 
@@ -114,6 +122,7 @@ export const Form = () => {
 
   return (
     <Grid container spacing={2}>
+      <CustomisedSnackbar open={open} setOpen={setOpen} />
       <Grid item xs={12}>
         <Typography align="center" variant="subtitle2" gutterBottom>
           {segment && segment.words.map((word) => word.value).join(' ')}
